@@ -5,7 +5,7 @@ In this project, you will train, run and serve a machine learning model using Do
 
 ## Deliverables
 
-- [ ] Clone this repository to your personal github account
+- [x] Clone this repository to your personal github account
 - [ ] Containerize training the machine learning model
 - [ ] Containerize serving of the machine learning model
 - [ ] Train and run the machine learning model using Docker
