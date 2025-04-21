@@ -1,7 +1,29 @@
-WORKDIR /app
-COPY requirements.txt .
-COPY server.py .
+# Dockerfile for the inference server
+# This Dockerfile is used to create a Docker image for the inference server
+# It is based on the Python 3.9 slim image
 FROM python:3.9-slim
-CMD ["python", "server.py"]
+
+# Set working directory
+# This is the directory where the inference server will be executed
+# and where the model will be loaded
+WORKDIR /app
+
+# Copy the list of Python packages required for the serving script
+COPY requirements.txt .
+
+# Install the Python dependencies inside the container
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the model files to the working directory
+# moved after dependencies
+COPY server.py .
+
+# Expose the port that the inference server will listen on
+# This is the port that the server will use to communicate with clients
+# The default port for the inference server is 8080
 EXPOSE 8080
+
+# Run the inference server
+CMD ["python", "server.py"]
+
+
