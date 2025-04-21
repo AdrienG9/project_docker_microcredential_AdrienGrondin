@@ -1,12 +1,42 @@
-FROM <base imagae>
+ARG OWNER=jupyter
+ARG BASE_CONTAINER=$OWNER/scipy-notebook:python-3.11.5
+FROM $BASE_CONTAINER
 
 # TODO: Set a working directory
+# This is the directory where the training script will be executed
+# and where the model will be saved
+WORKDIR /home/jovyan/app
+
+# Switch to root to create model output dir
+USER root
+RUN mkdir -p /home/jovyan/app/models
+# Give ownership to jovyan so it can write to it
+RUN chown -R jovyan /home/jovyan/app
+
+# Switch back to jovyan user
+USER jovyan
 
 # TODO: Copy the requirements.txt file to the working directory
+# This file contains the list of Python packages required for the training script
+# The requirements.txt file should be in the same directory as the Dockerfile
+COPY requirements.txt .
 
-# TODO: Install the Python dependencies
+# TODO: Install the Python dependencies inside the container
+# Use --no-cache-dir to avoid caching the packages
+# Useful for keeping the image size smaller
+RUN pip install --no-cache-dir -r requirements.txt
 
 # TODO: Copy the training script (train.py) to the working directory
+# This script contains the code to train the model
+# and save it to a specified location
+# The script should be in the same directory as the Dockerfile
+# If the script is in a different directory, adjust the path accordingly
+# For example, if the script is in a subdirectory called 'src', use:
+# COPY src/train.py .
+# If the script is in a parent directory, use:
+# COPY ../train.py .
+COPY train.py .
 
 # TODO: Run the training script that generates the model
-CMD [...]
+# This command will be executed when the container starts
+CMD ["python", "train.py"]
