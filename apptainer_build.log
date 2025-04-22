@@ -1,0 +1,4 @@
+FATAL:   While checking build target: build target 'train_container.sif' already exists. Use --force if you want to overwrite it
+FATAL:   While checking build target: build target 'infer_container.sif' already exists. Use --force if you want to overwrite it
+mv: 'train_container.sif' and '/scratch/gent/491/vsc49179/./train_container.sif' are the same file
+mv: 'infer_container.sif' and '/scratch/gent/491/vsc49179/./infer_container.sif' are the same file

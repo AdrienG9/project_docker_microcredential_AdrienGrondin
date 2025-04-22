@@ -36,12 +36,16 @@
 `docker login` 
 
 13. Then properly retagged my images for docker hub
-`docker tag train:version2 agrondin1/train:version2`
-`docker tag infer:version1 agrondin1/infer:version1`
+```bash
+docker tag train:version2 agrondin1/train:version2
+docker tag infer:version1 agrondin1/infer:version1
+```
 
 14. Finally proceeded to push images to docker Hub
-`docker push agrondin1/train:version2`
-`docker push agrondin1/infer:version1`
+```bash
+docker push agrondin1/train:version2
+docker push agrondin1/infer:version1
+```
 
 ## Building an Apptainer image on the HPC
 
@@ -52,8 +56,8 @@
 17. I then enter my scratch directory:
 `cd scratch/gent/491/vsc49179`
 
-18. Then went one to build the apptainer images:
-`nano build_apptainer_images.sh`
+18. Then went one to build the apptainer images: `nano build_apptainer_images.sh`
+```bash
 `#!/bin/bash`
 `#SBATCH --job-name=apptainer_build_all`
 `#SBATCH --output=apptainer_build.log`
@@ -67,11 +71,49 @@
 
 `# Build inference image`
 `apptainer build infer_container.sif docker://agrondin1/infer:version1`
+```
 
 19. Submitted the job to slurm
 `sbatch build_apptainer_images.sh`
 
-This did manage to create the infer container but not the train so I relaunch it with only the build training image.
+This did manage to create the infer container but not the train so I relaunch it with only the build training image. 
+
+20. I then switch to vs code server and modified the script to create the containers like so
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=job_submission
+#SBATCH --output=apptainer_build.log
+#SBATCH --partition=donphan
+#SBATCH --mem=8G
+#SBATCH --time=00:30:00
+# Apptainer is available system-wide so no need to load module
+```
+
+```bash
+# Build training image
+apptainer build --fakeroot train_container.sif docker://agrondin1/train:version2
+```
+
+```bash
+# Build inference image
+apptainer build --fakeroot infer_container.sif docker://agrondin1/infer:version1
+```
+
+```bash
+mv train_container.sif $VSC_SCRATCH/.
+mv infer_container.sif $VSC_SCRATCH/.
+```
 
 
+And then I finally manage to create both image plus the log of the slurm job. Unfortunately the .log is not complete because I creates the *sif files but had forgotten to use #SBATCH --output=apptainer_build.log and I had to do it again but now it just states that the file have been created.
+
+21. I copied the files to my user home directory:
+cp apptainer_build.log infer_container.sif train_container.sif /user/gent/491/vsc49179
+
+22. Then finally donwloaded the files and finally pushed everything except the *sif because they exceeded the limit supported by github:
+```bash
+remote: error: File infer_container.sif is 120.25 MB; this exceeds GitHub's file size limit of 100.00 MB
+remote: error: File train_container.sif is 1246.62 MB; this exceeds GitHub's file size limit of 100.00 MB
+```
 
